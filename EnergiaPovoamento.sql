@@ -10,9 +10,9 @@ USE sistemaenergia;
  INSERT INTO Turno
 	(Id, HoraInicio, HoraFim)
     Values 
-    (0,'00:00:00','08:00:00'),
-    (1,'08:00:00','16:00:00'),
-    (2,'16:00:00','00:00:00');
+    (1,'00:00:00','08:00:00'),
+    (2,'08:00:00','16:00:00'),
+    (3,'16:00:00','00:00:00');
 
 -- SELECT * FROM Turno;
 
@@ -54,18 +54,18 @@ INSERT INTO Rua
 INSERT INTO Funcionario
 	(Id, Nome, Salario, Rua, Turno_ID, Estagiario)
     Values
-    (1,'José Gonçalo Costa', 50000,1,0, False),
-    (2,'Arlindo da Fonte Torres',30000,2,0,False),
-    (3,'Ricardo Valadares Vieira',25000,3,1,False),
-    (4,'João José Imperadeiro',25000,4,1,False),
-    (5,'José Fernando Boticas',0,5,2,True),
-    (6,'Nelson Teixeira Pereira',0,6,2,True),
-    (7,'Bernardo Sellout Alves',27000,7,2,False),
-    (8,'Ricardo Fernandes Pacheco',35000,8,0,False),
-    (9,'Catarina Machado Vieira',0,9,1,True),
-    (10,'Alcina da Silva Costa',15000,10,0,False),
-    (11,'António Teixeira Costa',40000,10,1,False),
-    (12,'Manuel José Ribeiro',10000,11,2,False);
+    (1,'José Gonçalo Costa', 50000,1,1, False),
+    (2,'Arlindo da Fonte Torres',30000,2,1,False),
+    (3,'Ricardo Valadares Vieira',25000,3,2,False),
+    (4,'João José Imperadeiro',25000,4,2,False),
+    (5,'José Fernando Boticas',0,5,3,True),
+    (6,'Nelson Teixeira Pereira',0,6,3,True),
+    (7,'Bernardo Sellout Alves',27000,7,3,False),
+    (8,'Ricardo Fernandes Pacheco',35000,8,1,False),
+    (9,'Catarina Machado Vieira',0,9,2,True),
+    (10,'Alcina da Silva Costa',15000,10,1,False),
+    (11,'António Teixeira Costa',40000,10,2,False),
+    (12,'Manuel José Ribeiro',10000,11,3,False);
     
  -- SELECT * FROM Funcionario;
  
@@ -128,7 +128,7 @@ INSERT INTO Servico
     Values
     (1,1,1,'2018-11-18 21:17:17','2018-11-18 23:17:17',4000.0),
     (2,2,1,'2018-11-10 08:34:00','2018-11-10 10:34:00',1500.0),
-    (3,5,1,'2018-11-10 10:35:00','2018-11-10 12:35:14',800.0),
+    (3,5,1,'2018-11-10 10:35:00',null,800.0),
     (4,3,1,'2018-10-25 20:00:00','2018-10-25 22:10:01',3550.0),
     (5,4,1,'2018-11-15 03:34:03','2018-11-15 05:06:47',200.0),
     (6,6,2,'2018-11-02 16:54:04','2018-11-02 19:36:29',3580.0),

@@ -1,7 +1,7 @@
 use sistemaenergia;
 
 -- E4: Saber quais os equipamentos que necessitam de reparação urgente
-Select * from Dispositivo where RequerReparacao = True;    
+Select * from Dispositivo where RequerReparacao = True;
 
 -- E6: Saber os telefones dos funcionários que estão em serviço num dado horário
 SELECT Telefone FROM 
@@ -17,3 +17,9 @@ select p.descricao, avg(f.salario) from
                   where f.estagiario = false
                   group by p.id
                   order by p.descricao;
+
+-- E32:	Saber os funcionários que ganham x
+select nome from Funcionario where salario = 1500;
+
+-- E33: Ordenar os dispositivos por quantidade de energia produzida
+select ID from Dispositivo order by EnergiaProduzida;
