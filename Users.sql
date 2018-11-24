@@ -5,15 +5,15 @@ GRANT ALL PRIVILEGES ON sistemaenergia.* TO 'Chefe'@'localhost'
 
 CREATE ROLE 'funcionario';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.compra TO 'funcionario';
+GRANT SELECT, INSERT ON sistemaenergia.compra TO 'funcionario';
 GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.dispositivo TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.fornecedor TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.peca TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.servico TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.servicofuncionario TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.servicopeca TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.tipodispositivo TO 'funcionario';
-GRANT SELECT, INSERT, UPDATE, DELETE ON sistemaenergia.tiposervico TO 'funcionario';
+GRANT SELECT ON sistemaenergia.fornecedor TO 'funcionario';
+GRANT SELECT, INSERT, UPDATE ON sistemaenergia.peca TO 'funcionario';
+GRANT SELECT, INSERT, UPDATE ON sistemaenergia.servico TO 'funcionario';
+GRANT SELECT, INSERT ON sistemaenergia.servicofuncionario TO 'funcionario';
+GRANT SELECT, INSERT, UPDATE ON sistemaenergia.servicopeca TO 'funcionario';
+GRANT SELECT, INSERT, UPDATE ON sistemaenergia.tipodispositivo TO 'funcionario';
+GRANT SELECT, INSERT, UPDATE ON sistemaenergia.tiposervico TO 'funcionario';
 
 SHOW GRANTS FOR 'funcionario';
 

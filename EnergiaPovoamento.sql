@@ -43,7 +43,7 @@ INSERT INTO Rua
     (3,'Avenida das Parretas',1),
     (4,'Rua Fernando Pessoa',1),
     (5,'Rua Santiago Bernabeu',4),
-    (6,'Rua ALberto Caeiro',2),
+    (6,'Rua Alberto Caeiro',2),
     (7,'Rua Ricardo Reis',3),
     (8,'Rua do Carnaval',5),
     (9,'Rua Montalegrense',1),
@@ -120,7 +120,7 @@ INSERT INTO TipoServico
 	(Id, Designacao)
     Values
     (1,'Manutenção'),
-    (2,'ReperaçãoUrgente');
+    (2,'ReparaçãoUrgente');
 
 -- Povoamento da tabela "Serviço"
 INSERT INTO Servico
@@ -134,7 +134,7 @@ INSERT INTO Servico
     (6,6,2,'2018-11-02 16:54:04','2018-11-02 19:36:29',3580.0),
     (7,7,2,'2018-10-23 16:55:21','2018-10-23 18:51:02',4870.0),
     (8,8,1,'2018-11-11 12:40:00','2018-11-11 14:47:02',720.0),
-    (9,9,2,'2018-11-01 16:43:54','2018-11-01 17:58:00',5890.0),
+    (9,9,2,'2018-11-01 16:43:54',null,5890.0),
     (10,10,1,'2018-11-09 17:43:21','2018-11-09 21:02:00',368.0),
     (11,11,1,'2018-10-31 11:23:42','2018-10-31 13:21:09',768.0),
     (12,12,2,'2018-10-29 02:13:11','2018-10-29 04:37:00',4640.0),
@@ -195,7 +195,7 @@ INSERT INTO Peca
     (4,501245963,459,'Porca',0.10);
 
 INSERT INTO Compra
-	(Id, Peca_Id, DATA, Quantidade)
+	(Id, Peca_Id, Data, Quantidade)
     Values
     (1,1,'2018-06-23 01:23:00',153),
     (2,1,'2018-07-22 09:38:00',300),

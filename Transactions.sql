@@ -1,99 +1,99 @@
-use sistemaenergia;
-
-delimiter //
-create procedure CompraPecaExistente(IN pecaID int, IN qtd int)
-	begin
+DELIMITER //
+CREATE PROCEDURE CompraPecaExistente(IN pecaID INT, IN qtd INT)
+	BEGIN
 		DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
-		start transaction;
-			insert into compra 
+		START TRANSACTION;
+			INSERT INTO compra 
 				(Peca_ID, Data, Quantidade)
-                values
-                (pecaID, now(), qtd);
-			update Peca set QtdStock = QtdStock + qtd where ID = pecaID;
-		commit;
-	end//
+                VALUES
+                (pecaID, NOW(), qtd);
+			UPDATE Peca SET QtdStock = QtdStock + qtd WHERE ID = pecaID;
+		COMMIT;
+	END//
 
--- call CompraPecaExistente(20,2);
+-- CALL CompraPecaExistente(20,2);
 
 
-delimiter //
-create procedure usarPeca(IN pecaID int, IN qtd int, IN servicoID int)
-	begin
-		declare stock int;
-        declare existe int;
+DELIMITER //
+CREATE PROCEDURE usarPeca(IN pecaID INT, IN qtd INT, IN servicoID INT)
+	BEGIN
+		DECLARE stock INT;
+        DECLARE existe INT;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
-		start transaction;
-			select qtdStock into stock from Peca where ID = pecaID;
-			if qtd > stock
-				then
-					call CompraPecaExistente(pecaID, qtd); -- Optamos por comprar o que necessita para ficarmos com stock
-			end if;
-			update Peca set QtdStock = QtdStock - qtd where ID = pecaID;
+		START TRANSACTION;
+			SELECT qtdStock INTO stock FROM Peca WHERE ID = pecaID;
+			IF qtd > stock
+				THEN
+					CALL CompraPecaExistente(pecaID, qtd); -- Optamos por comprar o que necessita para ficarmos com stock
+			END IF;
+			UPDATE Peca SET QtdStock = QtdStock - qtd WHERE ID = pecaID;
             
-            select QtdUsada into existe from ServicoPeca where servico_id = servicoid and peca_id = pecaid;
-            if existe is null
-				then
-					insert into ServicoPeca
-						(Servico_ID, Peca_ID, QtdUsada)
-						values
-						(servicoID, pecaID, qtd);
-			else update servicopeca set qtdusada = qtdusada + qtd where servico_id = servicoid and peca_id = pecaid;
-            end if;
-		commit;
-	end//
+            SELECT QtdUsada INTO existe FROM ServicoPeca WHERE servico_id = servicoid AND peca_id = pecaid;
+            IF existe IS NULL THEN
+				INSERT INTO ServicoPeca
+					(Servico_ID, Peca_ID, QtdUsada)
+					VALUES
+					(servicoID, pecaID, qtd);
+			ELSE
+				UPDATE servicopeca SET qtdusada = qtdusada + qtd WHERE servico_id = servicoid AND peca_id = pecaid;
+            END IF;
+		COMMIT;
+	END//
     
--- call usarPeca(2, 3, 3);
+-- CALL usarPeca(2, 3, 3);
 
-delimiter //
-create procedure adicionarFuncionario(IN rua varchar(45), IN localidade varchar(45), IN pais varchar(45), IN turnoID int, IN nome varchar(45), IN salario float, IN estagiario boolean, IN telefone varchar(12))
-	begin
-		declare idRua int;
-        declare idLocalidade int;
-        declare idPais int;
-        declare idFuncionario int;
+DELIMITER //
+CREATE PROCEDURE adicionarFuncionario(IN rua VARCHAR(45), IN localidade VARCHAR(45), IN pais VARCHAR(45), IN turnoID INT, IN nome VARCHAR(45), IN salario FLOAT, IN estagiario BOOLEAN, IN telefone VARCHAR(12))
+	BEGIN
+		DECLARE idRua INT;
+        DECLARE idLocalidade INT;
+        DECLARE idPais INT;
+        DECLARE idFuncionario INT;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
-		start transaction;
-			select ID into idPais from Pais where descricao = pais;
-            if idPais is null then
-				insert into Pais
+		START TRANSACTION;
+			SELECT ID INTO idPais FROM Pais WHERE descricao = pais;
+            IF idPais IS NULL THEN
+				INSERT INTO Pais
                 (Descricao)
-                values
+                VALUES
                 (pais);
-                select last_insert_id() into idPais;
-			end if;
-			select ID into idLocalidade from Localidade where descricao = localidade;
-            if idLocalidade is null then
-				insert into Localidade
-                (Descricao, Pais)
-                values
-                (localidade, idPais);
-                select last_insert_id() into idLocalidade;
-			end if;
-			select ID into idRua from Rua where descricao = rua;
-            if idRua is null then
-				insert into Rua
-                (Descricao, Localidade)
-                values
-                (rua, idLocalidade);
-                select last_insert_id() into idRua;
-			end if;
-            
-			insert into Funcionario
-            (Nome, Salario, Rua, Turno_ID, Estagiario)
-            values
-            (nome, salario, idRua, turnoID, estagiario);
-            select last_insert_id() into idFuncionario; 
-			call adicionarTelefone(idFuncionario, telefone);
-		commit;
-	end//
+                SELECT last_insert_id() INTO idPais;
+			END IF;
 
-delimiter //
-create procedure adicionarTelefone(IN funcionarioID int, IN telefone varchar(12))
-	begin
-		insert into Telefones
+			SELECT ID INTO idLocalidade FROM Localidade WHERE descricao = localidade;
+            IF idLocalidade IS NULL THEN
+				INSERT INTO Localidade
+                (Descricao, Pais)
+                VALUES
+                (localidade, idPais);
+                SELECT last_insert_id() INTO idLocalidade;
+			END IF;
+
+			SELECT ID INTO idRua FROM Rua WHERE descricao = rua;
+            IF idRua IS NULL THEN
+				INSERT INTO Rua
+                (Descricao, Localidade)
+                VALUES
+                (rua, idLocalidade);
+                SELECT last_insert_id() INTO idRua;
+			END IF;
+            
+			INSERT INTO Funcionario
+            (Nome, Salario, Rua, Turno_ID, Estagiario)
+            VALUES
+            (nome, salario, idRua, turnoID, estagiario);
+            SELECT last_insert_id() INTO idFuncionario; 
+			CALL adicionarTelefone(idFuncionario, telefone);
+		COMMIT;
+	END//
+
+DELIMITER //
+CREATE PROCEDURE adicionarTelefone(IN funcionarioID INT, IN telefone VARCHAR(12))
+	BEGIN
+		INSERT INTO Telefones
 		(Funcionario_ID, Telefone)
-		values
+		VALUES
 		(funcionarioID, telefone);
-	end//
+	END//
     
--- call adicionarFuncionario('Rua Pablo Escobar', 'Medellin', 'Colombia', 2, 'Paco Estevan', 0, true, '573007945529');
+-- CALL adicionarFuncionario('Rua Pablo Escobar', 'Medellin', 'Colombia', 2, 'Paco Estevan', 0, true, '573007945529');

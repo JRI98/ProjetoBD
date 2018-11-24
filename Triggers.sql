@@ -1,33 +1,30 @@
-delimiter // 
-create trigger criaServico after update on Dispositivo
-	for each row 
-    begin
-    if old.requerReparacao=False and new.requerReparacao=True then 
-		insert into Servico (Dispositivo_Id, Tipo, DataInicio, DataFim, CustoTotal) 
-        values(old.id,old.tipo,NOW(),NULL,0);
-	end if;
-    end //
+DELIMITER // 
+CREATE TRIGGER criaServico AFTER UPDATE ON Dispositivo
+	FOR EACH ROW
+    BEGIN
+        IF old.requerReparacao=False AND new.requerReparacao=True THEN 
+            INSERT INTO Servico (Dispositivo_Id, Tipo, DataInicio, DataFim, CustoTotal) 
+            VALUES (old.id, 2, NOW(), NULL, 0); -- O valor 2 representa uma ReparaçãoUrgente
+        END IF;
+    END //
 
--- update Dispositivo set RequerReparacao = True where id=4;
+-- UPDATE Dispositivo SET RequerReparacao = True WHERE id=4;
 
--- Drop Trigger criaServico;
+-- DROP TRIGGER criaServico;
 
 -- SELECT * FROM Dispositivo;
 
 -- SELECT * FROM Servico;
 
-
-delimiter // 
+DELIMITER // 
 CREATE TRIGGER fimDeServico AFTER UPDATE ON Servico
-	for each row
+	FOR EACH ROW
     BEGIN
-    IF old.dataFim IS NULL and new.dataFim IS NOT NULL then 
-		UPDATE Dispositivo SET RequerReparacao=False, UltimaManutencao=new.dataFim, 
-        ProximaManutencao=DATE_ADD(new.dataFim, INTERVAL 1 MONTH) WHERE id=old.Dispositivo_id;
-        
-	END IF;
-END //
-    
+        IF old.dataFim IS NULL AND new.dataFim IS NOT NULL THEN 
+            UPDATE Dispositivo SET RequerReparacao=False, UltimaManutencao=new.dataFim, 
+            ProximaManutencao=DATE_ADD(new.dataFim, INTERVAL 1 MONTH) WHERE id=old.Dispositivo_id;
+        END IF;
+    END //
 
 -- DROP TRIGGER fimDeServico;   
 

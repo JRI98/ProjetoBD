@@ -1,19 +1,19 @@
-CREATE VIEW NIFFornecedor AS
-SELECT * FROM Fornecedor;
+CREATE VIEW NIFFornecedores AS
+SELECT NIF FROM Fornecedor;
 
 CREATE VIEW InfoFuncionarios AS
-SELECT f.nome as Nome, t.id as Turno, tel.telefone as Telefone, r.descricao as Rua, l.descricao as Localidade, p.descricao as País FROM 
- Funcionario f inner join Rua r on r.id = f.rua
-		 		  inner join Localidade l on r.localidade = l.id
-                   inner join Pais p on l.pais = p.id
-                   inner join Telefones tel on f.id = tel.funcionario_id
-                   inner join Turno t on f.turno_id = t.id;
+SELECT f.nome AS Nome, t.id AS Turno, tel.telefone AS Telefone, r.descricao AS Rua, l.descricao AS Localidade, p.descricao AS País FROM 
+        Funcionario f INNER JOIN Rua r ON r.id = f.rua
+		 		      INNER JOIN Localidade l ON r.localidade = l.id
+                      INNER JOIN Pais p ON l.pais = p.id
+                      INNER JOIN Telefones tel ON f.id = tel.funcionario_id
+                      INNER JOIN Turno t ON f.turno_id = t.id;
 
 -- SELECT * FROM InfoFuncionarios;
 
-CREATE VIEW Gastos AS
-SELECT f.Designacao as Fornecedor, ROUND(SUM(c.quantidade * p.precoUnitario)) as Gastos
-	FROM Fornecedor f inner join Peca p on p.NIF_fornecedor=f.NIF
-					  inner join Compra c on c.peca_id=p.id
-                      GROUP BY Fornecedor ORDER BY Gastos DESC;
-
+CREATE VIEW FornecedoresPorGastos AS
+SELECT f.Designacao AS Fornecedor, ROUND(SUM(c.quantidade * p.precoUnitario)) AS Gastos
+	FROM Fornecedor f INNER JOIN Peca p ON p.NIF_fornecedor=f.NIF
+					  INNER JOIN Compra c ON c.peca_id=p.id
+                      GROUP BY Fornecedor
+                      ORDER BY Gastos DESC;
