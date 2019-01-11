@@ -10,6 +10,12 @@ mycon = mydb.connect(host='localhost', user='root', password='', database='siste
 # Acesso ao MongoDB
 mondb = mondb.MongoClient('mongodb://localhost:27017/')['sistemaenergia']
 
+# Dicionário para converter ID's do MySQL em ID's do MongoDB
+ids = {
+    'pecas': {},
+    'funcionarios': {},
+    'dispositivos': {}
+}
 
 ### Dispositivos
 # Extrair os dispositivos
@@ -27,7 +33,6 @@ def inserirDispositivo(dispositivo):
     (id, tipo, requerReparacao, energiaProduzida, ultimaManutencao, proximaManutencao, latitude, longitude) = dispositivo
 
     dispositivo = {
-                    'id': id,
                     'tipo': tipo,
                     'requerReparacao': bool(requerReparacao),
                     'energiaProduzida': energiaProduzida,
@@ -39,7 +44,8 @@ def inserirDispositivo(dispositivo):
                                    }
                     }
 
-    mondb['Dispositivos'].insert_one(dispositivo)
+    newID = mondb['Dispositivos'].insert_one(dispositivo)
+    ids['dispositivos'][id] = newID.inserted_id
 
     print('Dispositivo', id, 'inserido')
 
@@ -62,7 +68,6 @@ def extrairComprasPeca(id_peca):
     compras = []
     for c in aux:
         compra = {
-            'id': c[0],
             'data': c[1],
             'quantidade': c[2]
         }
@@ -78,7 +83,6 @@ def inserirPeca(peca):
     compras = extrairComprasPeca(id)
 
     peca = {
-             'id': id,
              'fornecedor': {
                              'nif': nifFornecedor,
                              'descricao': descricaoFornecedor
@@ -89,80 +93,10 @@ def inserirPeca(peca):
              'compras': compras
     }
 
-    mondb['Pecas'].insert_one(peca)
+    newID = mondb['Pecas'].insert_one(peca)
+    ids['pecas'][id] = newID.inserted_id
 
     print('Peca', id, 'inserida')
-
-### Servicos
-# Extrair os servicos
-def extrairServicos():
-    cur = mycon.cursor()
-    cur.execute("SELECT s.id, s.dispositivo_id, ts.designacao, s.datainicio, s.datafim, s.custoTotal\
-                 FROM servico s INNER JOIN tiposervico ts ON ts.id=s.tipo")
-    servicos = cur.fetchall()
-
-    return servicos
-
-# Extrair as peças usadas num serviço
-def extrairPecasServico(id_servico):
-    cur = mycon.cursor()
-    cur.execute("SELECT peca_id, qtdUsada FROM ServicoPeca WHERE servico_id=%s", (id_servico,))
-    aux = cur.fetchall()
-
-    pecas = []
-    for p in aux:
-        peca = {
-            'id': p[0],
-            'quantidadeUsada': p[1]
-        }
-        pecas.append(peca)
-
-    return pecas
-
-# Extrair os funcionários que trabalharam num serviço
-def extrairFuncionariosServico(id_servico):
-    cur = mycon.cursor()
-    cur.execute("SELECT f.id, f.nome FROM ServicoFuncionario sf\
-                 INNER JOIN Funcionario f ON sf.funcionario_id=f.id WHERE servico_id=%s", (id_servico,))
-    aux = cur.fetchall()
-
-    funcionarios = []
-    for f in aux:
-        telefones = extrairTelefonesFuncionario(f[0])
-        funcionario = {
-            'id': f[0],
-            'nome': f[1],
-            'telefones': telefones
-        }
-        funcionarios.append(funcionario)
-
-    return funcionarios
-
-# Inserir um serviço
-def inserirServico(servico):
-    (id, dispositivo_id, tipo, datainicio, datafim, custoTotal) = servico
-
-    # Obter as peças usadas no serviço
-    pecasUsadas = extrairPecasServico(id)
-
-    # Obter os funcionários que fizeram o serviço
-    fucionariosAlocados = extrairFuncionariosServico(id)
-
-    servico = {
-                'id': id,
-                'dispositivo_id': dispositivo_id,
-                'tipo': tipo,
-                'dataInicio': datainicio,
-                'dataFim': datafim,
-                'custoTotal': custoTotal,
-                'pecasUsadas': pecasUsadas,
-                'funcionariosAlocados': fucionariosAlocados
-    }
-
-    mondb['Servicos'].insert_one(servico)
-
-    print ('Servico', id, 'inserido')
-
 
 ### Funcionarios
 # Extrair os funcionários
@@ -201,7 +135,6 @@ def inserirFuncionario(funcionario):
     telefones = extrairTelefonesFuncionario(id)
 
     funcionario = {
-                'id': id,
                 'nome': nome,
                 'telefones': telefones,
                 'salario': salario,
@@ -217,9 +150,79 @@ def inserirFuncionario(funcionario):
                          }
     }
 
-    mondb['Funcionarios'].insert_one(funcionario)
+    newID = mondb['Funcionarios'].insert_one(funcionario)
+    ids['funcionarios'][id] = newID.inserted_id
 
     print('Funcionario', id, 'inserido')
+
+### Servicos
+# Extrair os servicos
+def extrairServicos():
+    cur = mycon.cursor()
+    cur.execute("SELECT s.id, s.dispositivo_id, ts.designacao, s.datainicio, s.datafim, s.custoTotal\
+                 FROM servico s INNER JOIN tiposervico ts ON ts.id=s.tipo")
+    servicos = cur.fetchall()
+
+    return servicos
+
+# Extrair as peças usadas num serviço
+def extrairPecasServico(id_servico):
+    cur = mycon.cursor()
+    cur.execute("SELECT peca_id, qtdUsada FROM ServicoPeca WHERE servico_id=%s", (id_servico,))
+    aux = cur.fetchall()
+
+    pecas = []
+    for p in aux:
+        peca = {
+            'id': ids['pecas'][p[0]],
+            'quantidadeUsada': p[1]
+        }
+        pecas.append(peca)
+
+    return pecas
+
+# Extrair os funcionários que trabalharam num serviço
+def extrairFuncionariosServico(id_servico):
+    cur = mycon.cursor()
+    cur.execute("SELECT f.id, f.nome FROM ServicoFuncionario sf\
+                 INNER JOIN Funcionario f ON sf.funcionario_id=f.id WHERE servico_id=%s", (id_servico,))
+    aux = cur.fetchall()
+
+    funcionarios = []
+    for f in aux:
+        telefones = extrairTelefonesFuncionario(f[0])
+        funcionario = {
+            'id': ids['funcionarios'][f[0]],
+            'nome': f[1],
+            'telefones': telefones
+        }
+        funcionarios.append(funcionario)
+
+    return funcionarios
+
+# Inserir um serviço
+def inserirServico(servico):
+    (id, dispositivo_id, tipo, datainicio, datafim, custoTotal) = servico
+
+    # Obter as peças usadas no serviço
+    pecasUsadas = extrairPecasServico(id)
+
+    # Obter os funcionários que fizeram o serviço
+    fucionariosAlocados = extrairFuncionariosServico(id)
+
+    servico = {
+                'dispositivo_id': ids['dispositivos'][dispositivo_id],
+                'tipo': tipo,
+                'dataInicio': datainicio,
+                'dataFim': datafim,
+                'custoTotal': custoTotal,
+                'pecasUsadas': pecasUsadas,
+                'funcionariosAlocados': fucionariosAlocados
+    }
+
+    mondb['Servicos'].insert_one(servico)
+
+    print ('Servico', id, 'inserido')
 
 
 ### Função main
@@ -232,12 +235,12 @@ def main():
     for peca in extrairPecas():
         inserirPeca(peca)
 
-    # Inserir todos os serviços na coleção Servicos
-    for servico in extrairServicos():
-        inserirServico(servico)
-
     # Inserir todos os funcionários na coleção Funcionarios
     for funcionario in extrairFuncionarios():
         inserirFuncionario(funcionario)
+
+    # Inserir todos os serviços na coleção Servicos
+    for servico in extrairServicos():
+        inserirServico(servico)
 
 main()
